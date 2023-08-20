@@ -20,6 +20,12 @@ import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import com.example.image.databinding.ActivityMainBinding
+import com.example.image.databinding.FragmentHomeBinding
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,8 +49,13 @@ class HomeFragment : Fragment() {
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
     val permissionRequest: MutableList<String> = ArrayList()
     var image_uri:  Uri ?= null
+    var upload_uri: Uri ?= null
     private val IMAGE_CAPTURE_CODE: Int = 1001
-//    lateinit var contentResolver: ContentResolver
+    private lateinit var binding: FragmentHomeBinding
+    private lateinit var firebaseref: DatabaseReference
+    private lateinit var storageref: StorageReference
+    private lateinit var imageLauncher: ActivityResultLauncher<Array<String>>
+
 
 
 
@@ -65,17 +76,29 @@ class HomeFragment : Fragment() {
 
         }
 
-        // Inflate the layout for this fragment
-        var view = inflater.inflate(R.layout.fragment_home, container, false)
+        binding = FragmentHomeBinding.inflate(layoutInflater)
+        firebaseref = FirebaseDatabase.getInstance().getReference("Images")
 
-        camera = view.findViewById(R.id.camera)
-        image_view = view.findViewById(R.id.image)
+        //code for picking the image from the gallery
+        val pickimage = registerForActivityResult(ActivityResultContracts.GetContent()){
 
-        camera.setOnClickListener {
+            binding.image.setImageURI(it)
+            if(it != null){
+                upload_uri = it
+            }
+        }
+
+        binding.camera.setOnClickListener {
             checkpermission()
         }
-        return view
+
+        binding.upload.setOnClickListener{
+            pickimage.launch("image/*")
+
+        }
+        return binding.root
     }
+
 
     private fun checkpermission(){
 
@@ -118,7 +141,7 @@ class HomeFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         //called when image was captured from the camera intent
         if(resultCode == Activity.RESULT_OK){
-            image_view.setImageURI(image_uri)
+            binding.image.setImageURI(image_uri)
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
