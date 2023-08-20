@@ -2,6 +2,7 @@ package com.example.image
 
 import android.Manifest
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
@@ -11,12 +12,14 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -25,7 +28,11 @@ import com.example.image.databinding.FragmentHomeBinding
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -53,7 +60,7 @@ class HomeFragment : Fragment() {
     private val IMAGE_CAPTURE_CODE: Int = 1001
     private lateinit var binding: FragmentHomeBinding
     private lateinit var firebaseref: DatabaseReference
-    private lateinit var storageref: StorageReference
+//    private lateinit var storageref: StorageReference
     private lateinit var imageLauncher: ActivityResultLauncher<Array<String>>
 
 
@@ -77,7 +84,7 @@ class HomeFragment : Fragment() {
         }
 
         binding = FragmentHomeBinding.inflate(layoutInflater)
-        firebaseref = FirebaseDatabase.getInstance().getReference("Images")
+//        firebaseref = FirebaseDatabase.getInstance().getReference("Images")
 
         //code for picking the image from the gallery
         val pickimage = registerForActivityResult(ActivityResultContracts.GetContent()){
@@ -96,6 +103,11 @@ class HomeFragment : Fragment() {
             pickimage.launch("image/*")
 
         }
+
+        binding.submit.setOnClickListener {
+            uploadImage()
+        }
+
         return binding.root
     }
 
@@ -144,6 +156,37 @@ class HomeFragment : Fragment() {
             binding.image.setImageURI(image_uri)
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun uploadImage(){
+        Log.d("uploadingimage", "entered")
+        val progressDialog = ProgressDialog(requireActivity())
+        progressDialog.setMessage("Detecting!!......")
+        progressDialog.setCancelable(true)
+        progressDialog.show()
+
+        val formatter = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault())
+        val now = Date()
+        val filename = formatter.format(now)
+        val storageref = FirebaseStorage.getInstance().getReference("images/$filename")
+
+        image_uri?.let {
+            storageref.putFile(it).addOnSuccessListener {
+
+                Log.d("upload", "true")
+                binding.image.setImageURI(null)
+                Toast.makeText(requireActivity(), "Successfully uploaded", Toast.LENGTH_SHORT).show()
+                if(progressDialog.isShowing) progressDialog.dismiss()
+
+            }.addOnFailureListener{
+
+                Log.d("upload", "false")
+                if(progressDialog.isShowing) progressDialog.dismiss()
+                Toast.makeText(requireActivity(), "Failed to upload", Toast.LENGTH_SHORT).show()
+
+            }
+        }
+
     }
 
 }
