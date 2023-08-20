@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "933576118297",
+    "firebase_url": "https://idetect-to-detect-objects-default-rtdb.firebaseio.com",
+    "project_id": "idetect-to-detect-objects",
+    "storage_bucket": "idetect-to-detect-objects.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:933576118297:android:3afb31d9e430dcaae45a88",
+        "android_client_info": {
+          "package_name": "com.example.image"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "933576118297-d4ecnmq87nmot8hft5183vlftjltdhu8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRIDmU7PwJBK2DXTJVZYUcC8bS6KD7QdM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "933576118297-d4ecnmq87nmot8hft5183vlftjltdhu8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
